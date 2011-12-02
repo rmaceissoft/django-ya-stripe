@@ -11,7 +11,7 @@ class SyncChargedObject(models.Model):
     # shopping cart or order instance
     content_type = models.ForeignKey(ContentType, related_name='stripes_charges_synced_objects')
     object_id    = models.PositiveIntegerField()
-    object       = GenericForeignKey('content_type', 'object_pk')
+    object       = GenericForeignKey('content_type', 'object_id')
 
     # The Stripe's charges that's been synced to.
     stripe_charge_id = models.CharField(max_length=50)
@@ -24,3 +24,9 @@ class SyncChargedObject(models.Model):
 
     objects = SyncChargedObjectManager()
 
+    def __unicode__(self):
+        return "%s synced as stripe's charge with id=%s" % (self.object, self.stripe_charge_id)
+
+    @property
+    def amount_by_refund(self):
+        return self.amount_charged - self.amount_refunded
